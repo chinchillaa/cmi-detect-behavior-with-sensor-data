@@ -1,0 +1,202 @@
+# CMI - センサーデータによる行動検出設定
+
+# プロジェクト設定
+project:
+  name: "cmi-detect-behavior-with-sensor-data"
+  description: "手首センサーデータからの身体焦点反復行動検出"
+  competition_url: "https://www.kaggle.com/competitions/cmi-detect-behavior-with-sensor-data"
+  deadline: "2025-09-02T23:59:00Z"
+
+# データ設定
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  interim_dir: "data/interim"
+  external_dir: "data/external"
+  
+  # 想定データファイル（データダウンロード後に更新）
+  train_file: "train.csv"
+  test_file: "test.csv"
+  sample_submission: "sample_submission.csv"
+  
+  # データ処理パラメータ
+  validation_split: 0.2
+  test_split: 0.1
+  random_state: 42
+  
+  # 時系列パラメータ
+  window_size: 1000  # 窓あたりのサンプル数
+  stride: 500        # 窓間のオーバーラップ
+  sampling_rate: 50  # Hz（データから確認予定）
+
+# 特徴量エンジニアリング
+features:
+  # 時間領域特徴量
+  time_domain:
+    - mean
+    - std
+    - min
+    - max
+    - skewness
+    - kurtosis
+    - rms
+    - zero_crossing_rate
+    
+  # 周波数領域特徴量
+  frequency_domain:
+    - fft_mean
+    - fft_std
+    - spectral_centroid
+    - spectral_rolloff
+    - spectral_bandwidth
+    - dominant_frequency
+    
+  # 時系列固有
+  time_series:
+    - autocorrelation
+    - partial_autocorrelation
+    - trend
+    - seasonality
+    - approximate_entropy
+    - sample_entropy
+
+# モデル設定
+models:
+  # ベースラインモデル
+  baseline:
+    random_forest:
+      n_estimators: 100
+      max_depth: 10
+      random_state: 42
+      
+    xgboost:
+      n_estimators: 100
+      max_depth: 6
+      learning_rate: 0.1
+      random_state: 42
+      
+    lightgbm:
+      n_estimators: 100
+      max_depth: 6
+      learning_rate: 0.1
+      random_state: 42
+
+  # 深層学習モデル
+  deep_learning:
+    lstm:
+      hidden_size: 128
+      num_layers: 2
+      dropout: 0.2
+      bidirectional: true
+      
+    cnn_1d:
+      filters: [64, 128, 256]
+      kernel_sizes: [3, 5, 7]
+      pool_size: 2
+      dropout: 0.2
+      
+    transformer:
+      d_model: 128
+      nhead: 8
+      num_layers: 6
+      dropout: 0.1
+
+# 学習設定
+training:
+  batch_size: 32
+  epochs: 100
+  learning_rate: 0.001
+  optimizer: "adam"
+  scheduler: "cosine"
+  early_stopping_patience: 10
+  
+  # クロスバリデーション
+  cv_folds: 5
+  cv_strategy: "time_series"  # または"stratified"
+  
+  # 指標
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1
+    - auc_roc
+    - auc_pr
+
+# ハイパーパラメータ最適化
+hyperopt:
+  n_trials: 100
+  timeout: 3600  # 秒
+  study_name: "cmi-bfrb-detection"
+  direction: "maximize"  # または"minimize"
+  
+  # 探索空間（例）
+  search_spaces:
+    xgboost:
+      n_estimators: [50, 200]
+      max_depth: [3, 10]
+      learning_rate: [0.01, 0.3]
+      subsample: [0.8, 1.0]
+      colsample_bytree: [0.8, 1.0]
+
+# アンサンブル設定
+ensemble:
+  methods:
+    - voting
+    - stacking
+    - blending
+  
+  base_models:
+    - xgboost
+    - lightgbm
+    - random_forest
+    - lstm
+  
+  meta_model: "logistic_regression"
+
+# 評価
+evaluation:
+  test_size: 0.2
+  metrics:
+    primary: "f1"  # コンペ指標（判明後に更新）
+    secondary:
+      - precision
+      - recall
+      - auc_roc
+      - auc_pr
+  
+  # コンペ固有
+  submission_format: "csv"
+  prediction_column: "prediction"
+
+# ログ出力と追跡
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+tracking:
+  use_wandb: true
+  project_name: "cmi-bfrb-detection"
+  entity: null  # あなたのwandbエンティティで更新
+  
+  use_mlflow: false
+  mlflow_uri: "sqlite:///mlruns.db"
+
+# 計算リソース
+compute:
+  n_jobs: -1  # 全ての利用可能コアを使用
+  gpu: true   # 利用可能な場合GPUを使用
+  memory_limit: "8GB"
+  
+# パス
+paths:
+  models: "models"
+  reports: "reports"
+  logs: "logs"
+  experiments: "experiments"
+  notebooks: "notebooks"
+
+# 再現性
+reproducibility:
+  seed: 42
+  deterministic: true

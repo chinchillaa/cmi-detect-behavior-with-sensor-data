@@ -1,0 +1,68 @@
+name: cmi-bfrb-detection
+channels:
+  - conda-forge
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - jupyter
+  - jupyterlab
+  - notebook
+  
+  # Core Data Science
+  - pandas>=2.0.0
+  - numpy>=1.24.0
+  - scipy>=1.10.0
+  - scikit-learn>=1.3.0
+  - matplotlib>=3.7.0
+  - seaborn>=0.12.0
+  - plotly>=5.15.0
+  
+  # Machine Learning
+  - xgboost>=1.7.0
+  - lightgbm>=4.0.0
+  
+  # Deep Learning
+  - pytorch>=2.0.0
+  - torchvision>=0.15.0
+  - torchaudio>=2.0.0
+  - cudatoolkit=11.8  # Adjust based on your CUDA version
+  
+  # Utilities
+  - tqdm
+  - joblib
+  - psutil
+  
+  # Development
+  - pytest
+  - black
+  - flake8
+  - isort
+  
+  # Data Processing
+  - pyarrow
+  
+  # Signal Processing
+  - librosa
+  - pywavelets
+  
+  - pip:
+    # Packages not available in conda
+    - pytorch-lightning>=2.0.0
+    - transformers>=4.30.0
+    - tsfresh>=0.20.0
+    - tslearn>=0.6.0
+    - pandas-profiling>=3.6.0
+    - sweetviz>=2.1.4
+    - optuna>=3.2.0
+    - wandb>=0.15.0
+    - kaggle>=1.5.0
+    - catboost>=1.2.0
+    - pyod>=1.1.0
+    - memory-profiler>=0.60.0
+    - line-profiler>=4.0.0
+    - pre-commit>=3.3.0
+    - polars>=0.18.0
+    - dask>=2023.5.0
+    - modin>=0.21.0
